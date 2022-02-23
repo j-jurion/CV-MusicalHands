@@ -26,7 +26,7 @@ class HandDetector():
     if self.results.multi_hand_landmarks:
       hand = self.findHand(leftHand)
       if hand:
-        cv.putText(img, text=handstr, org=coordinates, fontFace=cv.FONT_HERSHEY_TRIPLEX, fontScale=3, color=color,thickness=3)
+        cv.putText(img, text=handstr, org=coordinates, fontFace=cv.FONT_HERSHEY_TRIPLEX, fontScale=1, color=color,thickness=1)
         for id, lm in enumerate(hand.landmark):
           if id == fingerNo:
             h, w, ch = img.shape

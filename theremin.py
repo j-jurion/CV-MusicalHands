@@ -18,10 +18,10 @@ def volume_map(volume):
 
 def frequency_map(frequency):
   if frequency > 200:
-    return 800
+    return 850
   elif frequency < 15:
-    return 200
-  return frequency/200*600+200
+    return 100
+  return frequency/200*800+50
 
 while True:
   success, img = cap.read()
@@ -31,17 +31,18 @@ while True:
   #f8 = hand.findPosition(img, 8)
   
   #TODO test
-  frequency_handpos_4 = hand.findPosition(img, True, 4)
-  frequency_handpos_8 = hand.findPosition(img, True, 8)
-  volume_handpos_4 = hand.findPosition(img, False, 4)
-  volume_handpos_8 = hand.findPosition(img, False, 8)
+  frequency_handpos_4 = hand.findPosition(img, False, 4)
+  frequency_handpos_8 = hand.findPosition(img, False, 8)
+  volume_handpos_4 = hand.findPosition(img, True, 4)
+  volume_handpos_8 = hand.findPosition(img, True, 8)
   #print(f"frequency:    {frequency_handpos}          |    volume:    {volume_handpos}")
 
   try: 
     cv.line(img, (frequency_handpos_4[0][0], frequency_handpos_4[0][1]), (frequency_handpos_8[0][0], frequency_handpos_8[0][1]), (0, 255, 0), thickness=3, lineType=8)
     frequency = math.sqrt((frequency_handpos_8[0][0] - frequency_handpos_4[0][0])**2 + (frequency_handpos_8[0][1] - frequency_handpos_4[0][1])**2)
   except IndexError:
-    frequency = 440
+    frequency = 0
+    volume = 0
   try: 
     cv.line(img, (volume_handpos_4[0][0], volume_handpos_4[0][1]), (volume_handpos_8[0][0], volume_handpos_8[0][1]), (0, 255, 0), thickness=3, lineType=8)
     volume = math.sqrt((volume_handpos_8[0][0] - volume_handpos_4[0][0])**2 + (volume_handpos_8[0][1] - volume_handpos_4[0][1])**2)
@@ -51,15 +52,13 @@ while True:
 
 
   #sound_param = [] ;#Frequency, volume
+  frequency = frequency_map(frequency)
+  volume = volume_map(volume)
+  cv.putText(img, text=str("{:.2f}".format(frequency)), org=(500,100), fontFace=cv.FONT_HERSHEY_TRIPLEX, fontScale=1, color=(255,0,0),thickness=1)
+  cv.putText(img, text=str("{:.2f}".format(volume)), org=(100,100), fontFace=cv.FONT_HERSHEY_TRIPLEX, fontScale=1, color=(0,0,255),thickness=1)
 
-  #volume = volume_map(volume)
-  #frequency = frequency_map(frequency)
-  #print(f"frequencyRaw: {sound_param[0]}     |    volumeRaw: {sound_param[1]}")
-  #print(f"frequency:    {frequency}          |    volume:    {volume}")
-
-
-  #sound.play(440, volume)
-
+  if volume != 0:
+    sound.play(frequency)
 
   cv.imshow('image', img)
   cv.waitKey(1)
